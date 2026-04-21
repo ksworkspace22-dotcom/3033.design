@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Notes — 3033</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page {
+    min-height: 100vh;
+    padding: calc(var(--pad) * 3.2) var(--pad) calc(var(--pad) * 4);
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  .hero {
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .crumb {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted); font-weight: 500; margin-bottom: 12px;
+  }
+  .crumb a { color: var(--ink-muted); text-decoration: none; }
+  .hero h1 {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: clamp(44px, 6.5vw, 104px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero .intro {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 300;
+    font-size: clamp(16px, 1.5vw, 20px);
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: 620px;
+    margin-top: 24px;
+  }
+
+  .filters {
+    margin: 40px 0 20px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .filters button {
+    font: inherit;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-muted);
+    border-radius: 100px;
+    cursor: pointer;
+  }
+  .filters button.active {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+
+  .note {
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    gap: 40px;
+    padding: 32px 8px;
+    border-top: 1px solid var(--rule);
+    text-decoration: none;
+    color: inherit;
+    align-items: baseline;
+    transition: padding .2s var(--ease);
+    position: relative;
+  }
+  .note:last-child { border-bottom: 1px solid var(--rule); }
+  .note:hover { padding-left: 20px; }
+  .note::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .note:hover::before { opacity: 1; }
+  .note .left {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .note .n {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 20px;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .note .date {
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-muted); font-weight: 500;
+  }
+  .note .cat {
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+  }
+  .note .body h3 {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: clamp(24px, 2.8vw, 36px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .note .body h3 em { font-style: normal; color: var(--ink-muted); }
+  .note .body p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 620px;
+  }
+  .note .body .read {
+    margin-top: 14px;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted); font-weight: 500;
+  }
+  .note .meta-right {
+    display: flex; flex-direction: column; gap: 8px;
+    align-items: flex-end;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-muted); font-weight: 500;
+  }
+  .note .meta-right .author { color: var(--ink); }
+  .note .meta-right .arr { font-size: 16px; margin-top: 4px; }
+
+  @media (max-width: 760px) {
+    .note { grid-template-columns: 1fr; gap: 14px; }
+    .note .meta-right { align-items: flex-start; flex-direction: row; gap: 16px; }
+  }
+</style>
+<link rel="stylesheet" href="theme.css" />
+<script src="theme-toggle.js"></script>
+<script src="page-fade.js"></script>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="tl">
+    <a href="index.html" class="logomark"><span class="mark"></span><span class="wm">3033</span></a>
+  </div>
+  <div class="tr">
+    <div class="nav-cluster">
+      <a class="nav-link" href="outputs.html">Enter Lab</a>
+      <a class="nav-link" href="about.html">About</a>
+      <a class="nav-link active" href="notes.html">Notes</a>
+      <button id="theme-toggle" class="theme-toggle"></button>
+    </div>
+  </div>
+  <div class="bl">
+    <div class="bottom-info">
+      <span class="live-dot"></span>
+      <span>Notes</span>
+      <span class="sep">·</span>
+      <span id="ist-clock">--:--:--</span>
+      <span>IST</span>
+      <span class="sep">·</span>
+      <span class="ticker">42 entries · bench log, essays, misc</span>
+    </div>
+  </div>
+  <div class="br">
+    <a href="connect.html" class="cta-link">
+      <span>Start a project</span>
+    </a>
+  </div>
+</div>
+
+<main class="page">
+  <div class="wrap">
+
+    <section class="hero">
+      <div class="crumb"><a href="index.html">3033</a> / Notes</div>
+      <h1>What we learn<br/><em>out loud.</em></h1>
+      <p class="intro">A mixed log — bench notes, short essays, the occasional rant about fillet radii. Written by whoever was closest to the bench that day.</p>
+    </section>
+
+    <div class="filters" id="filters">
+      <button class="active" data-f="all">All · 42</button>
+      <button data-f="bench">Bench log · 28</button>
+      <button data-f="method">Method · 09</button>
+      <button data-f="essay">Essays · 05</button>
+    </div>
+
+    <section class="notes-list">
+
+      <a href="note.html?id=042" class="note" data-f="method">
+        <div class="left">
+          <span class="n">042</span>
+          <span class="date">02 Apr 2026</span>
+          <span class="cat">Method</span>
+        </div>
+        <div class="body">
+          <h3>Why we hand-finish every prototype enclosure <em>/ a defense of the finger-file.</em></h3>
+          <p>A thousand rupees of sandpaper is worth two weeks of tolerance stacking. This is not an aesthetic claim. It's a cost calculation, and one we've run enough times to trust.</p>
+          <div class="read">Read · 6 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Sam</span>
+          <span>Note 042</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=041" class="note" data-f="bench">
+        <div class="left">
+          <span class="n">041</span>
+          <span class="date">28 Mar 2026</span>
+          <span class="cat">Bench log</span>
+        </div>
+        <div class="body">
+          <h3>The 12 ms <em>/ notes from the tuning day.</em></h3>
+          <p>Quadruped V2, rear-pair swing timing. A change none of us wanted to make, but it's now in every build. Some photos, some plots, the one video that convinced us.</p>
+          <div class="read">Read · 8 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Nidhish</span>
+          <span>Quadruped V2</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=040" class="note" data-f="essay">
+        <div class="left">
+          <span class="n">040</span>
+          <span class="date">14 Mar 2026</span>
+          <span class="cat">Essay</span>
+        </div>
+        <div class="body">
+          <h3>Shipping hardware from Ahmedabad <em>/ what's changed in three years.</em></h3>
+          <p>Supply chains, talent, the friction of getting parts off a truck. A candid update from the shop floor — what's better, what's worse, what we'd tell someone starting today.</p>
+          <div class="read">Read · 14 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Kathan</span>
+          <span>Essay</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=039" class="note" data-f="bench">
+        <div class="left">
+          <span class="n">039</span>
+          <span class="date">08 Mar 2026</span>
+          <span class="cat">Bench log</span>
+        </div>
+        <div class="body">
+          <h3>Iris gripper v3 <em>/ third time's the charm, maybe.</em></h3>
+          <p>Finger count up, mass down, grip force up. The backlash problem we fixed, the cabling problem we haven't. A photo essay from two weeks of machining.</p>
+          <div class="read">Read · 5 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Kathan</span>
+          <span>Gripper Alpha</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=038" class="note" data-f="method">
+        <div class="left">
+          <span class="n">038</span>
+          <span class="date">21 Feb 2026</span>
+          <span class="cat">Method</span>
+        </div>
+        <div class="body">
+          <h3>The bench log <em>/ how we write it, why we share it.</em></h3>
+          <p>Our partners get read-access to every daily note we write about their project. Here's the format, the rules, and the occasional mistake.</p>
+          <div class="read">Read · 9 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Sam</span>
+          <span>Practice</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=037" class="note" data-f="bench">
+        <div class="left">
+          <span class="n">037</span>
+          <span class="date">14 Feb 2026</span>
+          <span class="cat">Bench log</span>
+        </div>
+        <div class="body">
+          <h3>Pune week one <em>/ first floor, first wear.</em></h3>
+          <p>Two quadrupeds in a working warehouse. We learned more in five days than we did in three lab weeks. A running list of things we wrote down while they walked.</p>
+          <div class="read">Read · 7 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Sam</span>
+          <span>Quadruped V2</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=036" class="note" data-f="essay">
+        <div class="left">
+          <span class="n">036</span>
+          <span class="date">02 Feb 2026</span>
+          <span class="cat">Essay</span>
+        </div>
+        <div class="body">
+          <h3>What a small studio owes its partners <em>/ and what it doesn't.</em></h3>
+          <p>A short piece on why we took on fewer projects this year, not more. With apologies to the three we had to turn down.</p>
+          <div class="read">Read · 6 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Sam</span>
+          <span>Essay</span>
+          
+        </div>
+      </a>
+
+      <a href="note.html?id=035" class="note" data-f="bench">
+        <div class="left">
+          <span class="n">035</span>
+          <span class="date">18 Jan 2026</span>
+          <span class="cat">Bench log</span>
+        </div>
+        <div class="body">
+          <h3>Delta Arm, cycle test #500 <em>/ what broke, what didn't.</em></h3>
+          <p>500 cycles of the rev 02 arm. The part that broke was the one we were least worried about. The part we feared held up. A short lesson.</p>
+          <div class="read">Read · 4 min</div>
+        </div>
+        <div class="meta-right">
+          <span class="author">Kathan</span>
+          <span>Delta Arm</span>
+          
+        </div>
+      </a>
+
+    </section>
+
+  </div>
+</main>
+
+<script src="shared.js"></script>
+<script>
+  const filters = document.querySelectorAll('#filters button');
+  filters.forEach(b => {
+    b.addEventListener('click', () => {
+      filters.forEach(x => x.classList.toggle('active', x === b));
+      const f = b.dataset.f;
+      document.querySelectorAll('.note').forEach(n => {
+        n.style.display = (f === 'all' || n.dataset.f === f) ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

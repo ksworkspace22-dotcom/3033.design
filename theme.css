@@ -1,0 +1,84 @@
+/* ─────────────────────────────────────────────────────────
+   Global theme — dark mode overrides
+   Applied to any page that links theme.css.
+   Toggled by [data-theme="dark"] on <html>.
+   ───────────────────────────────────────────────────────── */
+
+html[data-theme="dark"] {
+  --bg:        #0e0e0f !important;
+  --bg-2:      #17171a !important;
+  --bg-elev:   #17171a !important;
+  --ink:       #ededea !important;
+  --ink-2:     rgba(237,237,234,0.74) !important;
+  --ink-muted: rgba(237,237,234,0.52) !important;
+  --ink-faint: rgba(237,237,234,0.22) !important;
+  --rule:      rgba(237,237,234,0.14) !important;
+  --rule-2:    rgba(237,237,234,0.07) !important;
+  --accent:    #a8cc4a !important;
+}
+
+/* Outputs grid — placeholder tiles look right in both themes */
+html[data-theme="dark"] .grid > .tile,
+html[data-theme="dark"] .grid > .tile .art {
+  background: #2a2a2c !important;
+}
+
+/* Animated transition when flipping themes */
+html, body,
+.chrome a, .chrome button, a,
+.tile, .art, .col, .place, .phase, .pr, .submit, .mic,
+header, footer, main, section, div, span, p, h1, h2, h3, h4, input, select, textarea, button, em {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease, opacity .2s ease;
+}
+
+/* ─── Theme toggle (bottom-center, no border/box) ─── */
+.theme-toggle {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  padding: 0;
+  pointer-events: auto;
+  user-select: none;
+}
+.theme-toggle button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .25s ease, opacity .25s ease, transform .25s ease;
+}
+.theme-toggle button:hover {
+  color: var(--ink);
+}
+.theme-toggle .tt-sep {
+  width: 18px;
+  height: 1px;
+  background: var(--ink-faint);
+  display: inline-block;
+}
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Active icon gets full ink color */
+html[data-theme="light"] .theme-toggle .tt-sun,
+html:not([data-theme="dark"]) .theme-toggle .tt-sun {
+  color: var(--ink);
+}
+html[data-theme="dark"] .theme-toggle .tt-moon {
+  color: var(--ink);
+}

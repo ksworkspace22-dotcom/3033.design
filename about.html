@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About — 3033</title>
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap" />
+<script src="page-fade.js"></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #ffffff;
+    --ink:       #1e1e1f;
+    --ink-2:     rgba(30,30,31,0.72);
+    --ink-muted: rgba(30,30,31,0.50);
+    --ink-faint: rgba(30,30,31,0.22);
+    --rule:      rgba(30,30,31,0.14);
+    --rule-2:    rgba(30,30,31,0.08);
+    --accent:    #6b8b1a;
+    --pad:       clamp(20px, 2.2vw, 32px);
+    --ui:        clamp(10px, 0.72vw, 11.5px);
+    --ease:      cubic-bezier(0.7, 0, 0.22, 1);
+  }
+
+  html, body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Four-corner chrome — matches landing exactly ─── */
+  .chrome {
+    position: fixed;
+    inset: 0;
+    padding: var(--pad);
+    pointer-events: none;
+    z-index: 30;
+    display: grid;
+    grid-template-areas: "tl tr" "bl br";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
+  }
+  .chrome > * { pointer-events: auto; }
+  .chrome .tl { grid-area: tl; justify-self: start; align-self: start; }
+  .chrome .tr { grid-area: tr; justify-self: end;   align-self: start; }
+  .chrome .bl { grid-area: bl; justify-self: start; align-self: end;   }
+  .chrome .br { grid-area: br; justify-self: end;   align-self: end;   }
+
+  .chrome a,
+  .chrome span.corner {
+    color: inherit;
+    text-decoration: none;
+    font-family: 'Satoshi', sans-serif;
+    font-size: var(--ui);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: color .2s ease, opacity .2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .chrome a:hover { color: var(--accent); }
+
+  .chrome .tl a { color: var(--ink); }
+  .chrome .tr a {
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--ease), color .2s ease;
+  }
+  .chrome .tr a:hover { border-bottom-color: var(--accent); }
+  .chrome .bl .here { color: var(--ink); }
+  .chrome .bl .sep  { color: var(--ink-faint); }
+  .chrome .bl .cnt  { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .chrome .bl .cnt .cur { color: var(--ink); }
+  .chrome .br a { color: var(--accent); }
+  .chrome .br a:hover { opacity: 0.7; color: var(--accent); }
+
+  /* ── Inner stage (enclosed by corners, with margin) ─ */
+  .stage {
+    position: fixed;
+    inset: calc(var(--pad) * 2.4) calc(var(--pad) * 1.2);
+    overflow: hidden;
+    z-index: 5;
+  }
+
+  /* Horizontal ribbon — one continuous flow, no snapping */
+  .ribbon {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+  }
+  .panel {
+    flex: 0 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(40px, 5vw, 80px);
+    position: relative;
+  }
+  /* Vertical hairline between panels — acts as visual breath */
+  .panel + .panel::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 18%;
+    width: 1px; height: 64%;
+    background: var(--rule-2);
+  }
+
+  /* Section label (tiny, top of each panel) */
+  .lbl {
+    font-size: var(--ui);
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 28px;
+    display: inline-flex; gap: 10px; align-items: baseline;
+  }
+  .lbl .n { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Typography */
+  h1, h2, h3 { font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+  em { font-style: italic; color: var(--accent); font-weight: 500; }
+
+  /* ── 01 · Intro ────────────────────────── */
+  .p-intro { width: min(70vw, 760px); }
+  .p-intro h1 {
+    font-size: clamp(44px, 5.4vw, 84px);
+    letter-spacing: -0.03em;
+    line-height: 0.96;
+    margin-bottom: 28px;
+  }
+  .p-intro p {
+    font-size: clamp(15px, 1.05vw, 17px);
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 560px;
+  }
+
+  /* ── 02 · People (single row, tight) ───── */
+  .p-people { width: min(88vw, 1080px); }
+  .p-people h2 {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 32px;
+  }
+  .people-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .person {
+    display: flex; flex-direction: column;
+  }
+  .person .portrait {
+    aspect-ratio: 4 / 5;
+    background: #c9c9c9;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .person .portrait::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 14px; bottom: 12px;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+  }
+  .person h3 { font-size: 19px; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .person .role {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+  }
+
+  /* ── 03 · Locations ────────────────────── */
+  .p-loc { width: min(70vw, 780px); }
+  .p-loc h2 {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 32px;
+  }
+  .loc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+  .place { padding-top: 22px; border-top: 1px solid var(--rule); }
+  .place h3 { font-size: 26px; letter-spacing: -0.015em; margin-bottom: 14px; }
+  .place h3 em { color: var(--ink-muted); font-style: italic; }
+  .place .addr { font-size: 13px; line-height: 1.55; color: var(--ink-2); margin-bottom: 10px; }
+  .place .tags {
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* ── 04 · Practice (six phases, compressed) ─ */
+  .p-method { width: min(92vw, 1240px); }
+  .p-method h2 {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 8px;
+  }
+  .p-method .sub {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+    letter-spacing: 0.02em;
+  }
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+  }
+  .phase {
+    padding: 18px 18px 0 18px;
+    border-top: 1px solid var(--ink);
+    border-right: 1px solid var(--rule-2);
+    display: flex; flex-direction: column;
+    min-height: 220px;
+  }
+  .phase:last-child { border-right: 0; padding-right: 0; }
+  .phase .n {
+    font-size: 10px; letter-spacing: 0.2em;
+    color: var(--accent); font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .phase h3 {
+    font-size: 17px;
+    letter-spacing: -0.005em;
+    margin-bottom: 10px;
+    line-height: 1.15;
+  }
+  .phase h3 em { color: var(--ink-muted); font-style: italic; }
+  .phase p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin-top: auto;
+  }
+
+  /* ── 05 · Principles (compact 5, one row) ── */
+  .p-pr { width: min(94vw, 1280px); }
+  .p-pr h2 {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 32px;
+  }
+  .prs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+  }
+  .pr {
+    padding: 16px 18px 0 18px;
+    border-top: 1px solid var(--rule);
+    border-right: 1px solid var(--rule-2);
+    min-height: 180px;
+  }
+  .pr:last-child { border-right: 0; }
+  .pr .n {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-muted); font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .pr h3 {
+    font-size: 17px;
+    letter-spacing: -0.005em;
+    line-height: 1.18;
+  }
+  .pr h3 em { color: var(--ink-muted); font-style: italic; }
+
+  /* ── 06 · Yes / No (minimised) ───────────── */
+  .p-yn { width: min(78vw, 900px); }
+  .p-yn h2 {
+    font-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 32px;
+  }
+  .yn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .col h3 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    color: var(--ink-muted);
+  }
+  .col.yes h3 { color: var(--accent); }
+  .col ul { list-style: none; }
+  .col li {
+    padding: 10px 0;
+    border-top: 1px solid var(--rule-2);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .col li:first-child { border-top: 1px solid var(--rule); }
+
+  /* ── 07 · CTA ────────────────────────────── */
+  .p-cta { width: min(70vw, 760px); }
+  .p-cta h2 {
+    font-size: clamp(40px, 4.8vw, 72px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin-bottom: 36px;
+  }
+  .p-cta .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background .25s ease, color .25s ease;
+  }
+  .p-cta .cta:hover { background: var(--ink); color: #fff; }
+
+  /* Mobile — fall back to vertical stack */
+  @media (max-width: 900px) {
+    .stage { inset: calc(var(--pad) * 3) var(--pad) calc(var(--pad) * 3); }
+    .ribbon { flex-direction: column; height: auto; width: 100%; }
+    .panel { width: 100% !important; padding: 40px 0; min-height: auto; }
+    .panel + .panel::before { display: none; }
+    .people-row, .loc-grid, .phases, .prs, .yn { grid-template-columns: 1fr; }
+    .phase, .pr { border-right: 0; border-top: 1px solid var(--rule); min-height: auto; padding: 18px 0 18px; }
+  }
+</style>
+<link rel="stylesheet" href="theme.css" />
+<script src="theme-toggle.js"></script>
+</head>
+<body>
+
+<!-- ── Four corners — the enclosure ───────── -->
+<div class="chrome">
+  <div class="tl">
+    <a href="index.html">3033</a>
+  </div>
+  <div class="tr">
+    <a href="outputs.html">Enter Lab</a>
+  </div>
+  <div class="bl">
+    <span class="corner">
+      <span class="here">About</span>
+      <span class="sep">·</span>
+      <span class="cnt"><span class="cur" id="p-cur">01</span> / 06</span>
+    </span>
+  </div>
+  <div class="br">
+    <a href="connect.html">Let's Collaborate</a>
+  </div>
+</div>
+
+<!-- ── Enclosed stage ─────────────────────── -->
+<div class="stage" id="stage">
+  <div class="ribbon" id="ribbon">
+
+    <!-- 01 Intro -->
+    <section class="panel p-intro" data-idx="01">
+      <div class="lbl"><span class="n">01</span> · About</div>
+      <h1>A studio of <em>three</em>.</h1>
+      <p>Small on purpose — close to the bench on purpose.</p>
+    </section>
+
+    <!-- 02 People -->
+    <section class="panel p-people" data-idx="02">
+      <div class="lbl"><span class="n">02</span> · People</div>
+      <h2>3.</h2>
+      <div class="people-row">
+        <div class="person">
+          <div class="portrait" data-label="SAM"></div>
+          <h3>Sam U.</h3>
+        </div>
+        <div class="person">
+          <div class="portrait" data-label="KATHAN"></div>
+          <h3>Kathan</h3>
+        </div>
+        <div class="person">
+          <div class="portrait" data-label="NIDHISH"></div>
+          <h3>Nidhish</h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Locations -->
+    <section class="panel p-loc" data-idx="03">
+      <div class="lbl"><span class="n">03</span> · Locations</div>
+      <h2>Two spaces. Lightning speeds.</h2>
+      <div class="loc-grid">
+        <div class="place">
+          <h3>Bengaluru</h3>
+        </div>
+        <div class="place">
+          <h3>Ahmedabad</h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 Practice -->
+    <section class="panel p-method" data-idx="04">
+      <div class="lbl"><span class="n">04</span> · Practice</div>
+      <h2>How we work.</h2>
+      <div class="sub">Six phases, sketch to ship.</div>
+      <div class="phases">
+        <div class="phase">
+          <div class="n">01 · Frame</div>
+          <h3>The <em>problem.</em></h3>
+        </div>
+        <div class="phase">
+          <div class="n">02 · Sketch</div>
+          <h3>Three to five <em>options.</em></h3>
+        </div>
+        <div class="phase">
+          <div class="n">03 · CAD</div>
+          <h3>The first <em>real</em> drawing.</h3>
+        </div>
+        <div class="phase">
+          <div class="n">04 · Bench</div>
+          <h3>V1 <em>assembly.</em></h3>
+        </div>
+        <div class="phase">
+          <div class="n">05 · Field</div>
+          <h3>In the <em>wild.</em></h3>
+        </div>
+        <div class="phase">
+          <div class="n">06 · Ship</div>
+          <h3>Handoff <em>and care.</em></h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Principles -->
+    <section class="panel p-pr" data-idx="05">
+      <div class="lbl"><span class="n">05</span> · Principles</div>
+      <h2>Five we keep.</h2>
+      <div class="prs">
+        <div class="pr">
+          <div class="n">Pt. 01</div>
+          <h3>Make the <em>ugly</em> thing first.</h3>
+        </div>
+        <div class="pr">
+          <div class="n">Pt. 02</div>
+          <h3>The bench <em>is the interview.</em></h3>
+        </div>
+        <div class="pr">
+          <div class="n">Pt. 03</div>
+          <h3>Finish by <em>hand.</em></h3>
+        </div>
+        <div class="pr">
+          <div class="n">Pt. 04</div>
+          <h3>Document <em>while</em> you work.</h3>
+        </div>
+        <div class="pr">
+          <div class="n">Pt. 05</div>
+          <h3>If it doesn't survive the bench, <em>it doesn't leave.</em></h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 CTA -->
+    <section class="panel p-cta" data-idx="06">
+      <div class="lbl"><span class="n">06</span> · Collaborate</div>
+      <h2>If this sounds<br/>like your <em>kind</em><br/>of studio —</h2>
+      <a href="connect.html" class="cta">
+        <span>Start a project</span>
+      </a>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  /* ── Seamless horizontal ribbon ──────────────────────
+     Instead of a native-scroll element, we translate the
+     ribbon via transform. This gives us a single continuous
+     flow (no page-snap, no scrollbar), and lets us consume
+     BOTH vertical + horizontal wheel input smoothly. */
+
+  const stage  = document.getElementById('stage');
+  const ribbon = document.getElementById('ribbon');
+  const pCur   = document.getElementById('p-cur');
+  const panels = [...document.querySelectorAll('.panel')];
+
+  let target = 0;    // target x (negative = further right)
+  let cur    = 0;    // current x (eased)
+  let maxNeg = 0;    // clamp bound (recomputed)
+
+  function measure() {
+    const ribbonW = ribbon.scrollWidth;
+    const stageW  = stage.clientWidth;
+    maxNeg = Math.min(0, stageW - ribbonW);
+  }
+  window.addEventListener('resize', measure);
+
+  function clamp(v) { return Math.max(maxNeg, Math.min(0, v)); }
+
+  function updateCounter() {
+    // Panel whose center is closest to the stage center
+    const stageCenter = stage.clientWidth / 2;
+    let closest = panels[0], dxMin = Infinity;
+    for (const p of panels) {
+      const rect = p.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const cx = rect.left - stageRect.left + rect.width / 2;
+      const dx = Math.abs(cx - stageCenter);
+      if (dx < dxMin) { dxMin = dx; closest = p; }
+    }
+    if (closest && pCur) pCur.textContent = closest.dataset.idx;
+  }
+
+  function tick() {
+    cur += (target - cur) * 0.12;
+    if (Math.abs(target - cur) < 0.1) cur = target;
+    ribbon.style.transform = `translate3d(${cur}px, 0, 0)`;
+    updateCounter();
+    requestAnimationFrame(tick);
+  }
+
+  // Wheel: vertical OR horizontal intent both drive x
+  window.addEventListener('wheel', (e) => {
+    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    target = clamp(target - delta);
+    e.preventDefault();
+  }, { passive: false });
+
+  // Touch drag (mobile horizontal swipe)
+  let touchX = null;
+  window.addEventListener('touchstart', (e) => {
+    if (window.innerWidth <= 900) return; // let vertical scroll take over on mobile
+    touchX = e.touches[0].clientX;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (touchX === null) return;
+    const x = e.touches[0].clientX;
+    const dx = x - touchX;
+    touchX = x;
+    target = clamp(target + dx);
+  }, { passive: true });
+  window.addEventListener('touchend', () => { touchX = null; });
+
+  // Keyboard — move by ~85% of stage width per press
+  document.addEventListener('keydown', (e) => {
+    const step = stage.clientWidth * 0.85;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); target = clamp(target - step);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); target = clamp(target + step);
+    } else if (e.key === 'Home') { target = 0; }
+    else if (e.key === 'End')  { measure(); target = maxNeg; }
+  });
+
+  // Mobile: if viewport narrow, skip the JS ribbon (let CSS column stack scroll normally)
+  function setup() {
+    if (window.innerWidth <= 900) {
+      // disable horizontal mode — allow native vertical scroll
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.height = 'auto';
+      document.body.style.height = 'auto';
+      stage.style.position = 'static';
+      stage.style.inset = 'auto';
+      ribbon.style.transform = 'none';
+      return;
+    }
+    measure();
+    requestAnimationFrame(tick);
+  }
+
+  // Wait one tick for fonts/layout
+  requestAnimationFrame(() => requestAnimationFrame(setup));
+</script>
+
+</body>
+</html>

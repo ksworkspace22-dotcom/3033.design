@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3033 — Design × Robotics</title>
+<meta name="description" content="3033 — a hardware and robotics studio. We build the ideas that leave the screen." />
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #ffffff;
+    --bg-2:     #f5f5f4;
+    --ink:      #1e1e1f;
+    --ink-2:    rgba(30,30,31,0.72);
+    --ink-muted:rgba(30,30,31,0.50);
+    --ink-faint:rgba(30,30,31,0.22);
+    --rule:     rgba(30,30,31,0.14);
+    --accent:   #6b8b1a;
+    --pad:      clamp(20px, 2.2vw, 32px);
+    --ui:       clamp(10px, 0.72vw, 11.5px);
+    --ease:     cubic-bezier(0.7, 0, 0.22, 1);
+  }
+
+  html, body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body {
+    font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Chrome (four corners, no clock) ────────── */
+  .chrome {
+    position: fixed;
+    inset: 0;
+    padding: var(--pad);
+    pointer-events: none;
+    z-index: 10;
+    display: grid;
+    grid-template-areas: "tl tr" "bl br";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
+  }
+  .chrome > * { pointer-events: auto; }
+  .chrome .tl { grid-area: tl; justify-self: start; align-self: start; }
+  .chrome .tr { grid-area: tr; justify-self: end;   align-self: start; }
+  .chrome .bl { grid-area: bl; justify-self: start; align-self: end;   }
+  .chrome .br { grid-area: br; justify-self: end;   align-self: end;   }
+
+  .chrome a {
+    color: inherit;
+    text-decoration: none;
+    font: inherit;
+    transition: color .2s ease, opacity .2s ease;
+  }
+
+  /* Shared corner text style — all four corners identical */
+  .chrome a {
+    font-family: 'Satoshi', sans-serif !important;
+    font-size: var(--ui) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+  }
+
+  .logomark {
+    display: inline-flex; align-items: center;
+  }
+  .logomark .wm { display: inline-block; }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--ease), color .2s ease;
+  }
+  .nav-link:hover { border-bottom-color: var(--accent); color: var(--accent); }
+
+  /* Start-a-project (text link) */
+  .cta-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent);
+    transition: opacity .2s ease;
+  }
+  .cta-link:hover { opacity: 0.7; }
+
+  /* Bottom-left: about */
+  .about-link {
+    color: var(--ink-2);
+    transition: color .2s ease;
+  }
+  .about-link:hover { color: var(--accent); }
+
+  /* ── Stage (viewport) ─────────────────────── */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  /* Ambient grid */
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 56px 56px;
+    mask-image: radial-gradient(ellipse at center, #000 40%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 75%);
+    pointer-events: none;
+  }
+
+  /* Halo behind model */
+  .stage::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 70vmin; height: 70vmin;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(200, 250, 58, 0.14) 0%, rgba(200, 250, 58, 0) 60%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 3D model */
+  .model-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+  model-viewer {
+    width: min(85vmin, 900px);
+    height: min(85vmin, 900px);
+    background: transparent;
+    --poster-color: transparent;
+    pointer-events: auto;
+  }
+
+  /* ── Centered statement (overlay) ─────────── */
+  .statement {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 0 var(--pad);
+    pointer-events: none;
+    max-width: 1400px;
+  }
+
+  .kicker {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-bottom: 28px;
+  }
+
+  .headline {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 500;
+    font-size: clamp(28px, 3.8vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    pointer-events: auto;
+  }
+  .headline em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .sub {
+    margin-top: 20px;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 300;
+    font-size: clamp(12px, 0.95vw, 14px);
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    :root { --pad: 16px; }
+    .statement { padding-top: 10vh; }
+    .headline { font-size: clamp(24px, 6.5vw, 40px); }
+    .sub { font-size: 12px; }
+  }
+
+  /* Entry */
+  .reveal { opacity: 0; transform: translateY(8px); animation: revealIn .9s var(--ease) forwards; }
+  .reveal.d1 { animation-delay: .1s; }
+  .reveal.d2 { animation-delay: .25s; }
+  .reveal.d3 { animation-delay: .45s; }
+  .reveal.d4 { animation-delay: .6s; }
+  @keyframes revealIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<link rel="stylesheet" href="theme.css" />
+<script src="theme-toggle.js"></script>
+<script src="page-fade.js"></script>
+</head>
+<body>
+
+<!-- ── Stage ────────────────────────────── -->
+<div class="stage">
+  <div class="statement">
+    <h1 class="headline reveal d2">
+      We build <em>ideas</em> that leave<br/>
+      the screen<span style="color: var(--accent);">.</span>
+    </h1>
+    <p class="sub reveal d3">A small hardware &amp; robotics studio in Bengaluru and Ahmedabad. Sketch to field, in months not quarters.</p>
+  </div>
+</div>
+
+<!-- ── Chrome ──────────────────────────── -->
+<div class="chrome">
+  <div class="tl reveal d1">
+    <a href="index.html" class="logomark">
+      <span class="wm">3033</span>
+    </a>
+  </div>
+  <div class="tr reveal d2">
+    <a class="nav-link" href="outputs.html">Enter Lab</a>
+  </div>
+  <div class="bl reveal d3">
+    <a class="about-link" href="about.html">About</a>
+  </div>
+  <div class="br reveal d4">
+    <a href="connect.html" class="cta-link">Let's Collaborate</a>
+  </div>
+</div>
+
+</body>
+</html>

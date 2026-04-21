@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Let's collaborate — 3033</title>
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap" />
+<script src="page-fade.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #ffffff;
+    --ink:       #1e1e1f;
+    --ink-2:     rgba(30,30,31,0.72);
+    --ink-muted: rgba(30,30,31,0.50);
+    --ink-faint: rgba(30,30,31,0.22);
+    --rule:      rgba(30,30,31,0.14);
+    --rule-2:    rgba(30,30,31,0.08);
+    --accent:    #6b8b1a;
+    --pad:       clamp(20px, 2.2vw, 32px);
+    --ui:        clamp(10px, 0.72vw, 11.5px);
+    --ease:      cubic-bezier(0.7, 0, 0.22, 1);
+  }
+
+  html, body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Four-corner chrome ─────────────────────── */
+  .chrome {
+    position: fixed;
+    inset: 0;
+    padding: var(--pad);
+    pointer-events: none;
+    z-index: 30;
+    display: grid;
+    grid-template-areas: "tl tr" "bl br";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
+  }
+  .chrome > * { pointer-events: auto; }
+  .chrome .tl { grid-area: tl; justify-self: start; align-self: start; }
+  .chrome .tr { grid-area: tr; justify-self: end;   align-self: start; }
+  .chrome .bl { grid-area: bl; justify-self: start; align-self: end;   }
+  .chrome .br { grid-area: br; justify-self: end;   align-self: end;   }
+  .chrome a, .chrome span.cr {
+    color: inherit;
+    text-decoration: none;
+    font-family: 'Satoshi', sans-serif;
+    font-size: var(--ui);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: color .2s ease, opacity .2s ease;
+  }
+  .chrome a:hover { color: var(--accent); }
+  .chrome .br a { color: var(--accent); }
+  .chrome .bl .cr { color: var(--ink-muted); }
+
+  /* ── Stage ───────────────────────────────────── */
+  .stage {
+    position: fixed;
+    inset: calc(var(--pad) * 2.6) var(--pad);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .screen {
+    width: min(760px, 90vw);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn .6s var(--ease) forwards;
+  }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  h1 {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 500;
+    font-size: clamp(36px, 4.6vw, 64px);
+    letter-spacing: -0.025em;
+    line-height: 1.02;
+    margin-bottom: 18px;
+    text-wrap: balance;
+  }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+  .sub {
+    font-size: clamp(14px, 1.1vw, 17px);
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Borderless textarea ─────────────────────── */
+  .idea-input {
+    width: 100%;
+    max-width: 640px;
+    border: none;
+    outline: none;
+    background: transparent;
+    resize: none;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: clamp(18px, 1.6vw, 24px);
+    line-height: 1.45;
+    color: var(--ink);
+    text-align: center;
+    min-height: 90px;
+    padding: 10px 0 18px;
+    caret-color: var(--accent);
+  }
+  .idea-input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+  /* ── Mic button ──────────────────────────────── */
+  .mic-wrap {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .mic {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    position: relative;
+    transition: border-color .2s ease, color .2s ease, transform .2s ease;
+  }
+  .mic:hover { border-color: var(--ink); }
+  .mic.listening {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .mic.listening::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    opacity: 0.35;
+    animation: pulse 1.6s var(--ease) infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  .mic svg { width: 20px; height: 20px; }
+  .mic-hint {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .mic-hint.err { color: #b13b1f; }
+  .enter-hint {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .enter-hint.show { opacity: 1; }
+
+  /* ── Manifested / form ─────────────────────── */
+  .banner h1 em { color: var(--accent); }
+  .banner-sub { margin-bottom: 56px; }
+
+  .form {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+  }
+  .field label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .field input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    outline: none;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--ink);
+    padding: 8px 0 10px;
+    transition: border-color .2s ease;
+  }
+  .field input:focus { border-color: var(--ink); }
+  .field input::placeholder { color: var(--ink-faint); }
+
+  /* Phone field — country code + number, borderless, single underline */
+  .phone-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--rule);
+    transition: border-color .2s ease;
+  }
+  .phone-row:focus-within { border-color: var(--ink); }
+  .phone-row select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--ink);
+    padding: 8px 18px 10px 0;
+    cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%),
+                      linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
+    background-position: calc(100% - 8px) 55%, calc(100% - 3px) 55%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+  .phone-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--ink);
+    padding: 8px 0 10px;
+  }
+  .phone-row input::placeholder { color: var(--ink-faint); }
+
+  /* Calendly-like slot picker */
+  .cal-sec {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+  }
+  .cal-sec .lbl {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .cal-inner {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .cal-col { display: flex; flex-direction: column; gap: 8px; }
+  .cal-col h5 {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover { border-color: var(--ink); }
+  .chip.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .skip {
+    background: none; border: none;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 10px 4px;
+  }
+  .skip:hover { color: var(--ink); }
+  .submit {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 14px 22px;
+    border-radius: 100px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: background .2s ease, transform .2s ease, opacity .2s ease;
+  }
+  .submit:hover:not(:disabled) { background: var(--accent); transform: translateY(-1px); }
+  .submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* Thank you screen */
+  .thanks h1 em { color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .cal-inner { grid-template-columns: 1fr; }
+  }
+</style>
+<link rel="stylesheet" href="theme.css" />
+<script src="theme-toggle.js"></script>
+</head>
+<body>
+
+<!-- ── Four corners ─────────────────── -->
+<div class="chrome">
+  <div class="tl"><a href="index.html">3033</a></div>
+  <div class="tr"><a href="outputs.html">Enter Lab</a></div>
+  <div class="bl"><span class="cr">Let's Collaborate</span></div>
+  <div class="br"><a href="about.html">About</a></div>
+</div>
+
+<!-- ── Stage ─────────────────────────── -->
+<div class="stage">
+
+  <!-- SCREEN 1 — Ask -->
+  <section class="screen active" id="s-ask">
+    <h1>Let's design the <em>future</em>, together.</h1>
+    <p class="sub">Let us know what's on your mind and we'll bring it to life.</p>
+
+    <textarea id="idea" class="idea-input" rows="3" placeholder="Tell us what you want to build…" autofocus></textarea>
+
+    <div class="mic-wrap">
+      <button id="mic" class="mic" aria-label="Dictate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="3" width="6" height="12" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+        </svg>
+      </button>
+      <span class="mic-hint" id="mic-hint">Tap to dictate</span>
+      <span class="enter-hint" id="enter-hint">Press Enter ↵ to continue</span>
+    </div>
+  </section>
+
+  <!-- SCREEN 2 — Manifested + form -->
+  <section class="screen banner" id="s-form">
+    <h1><em>Manifested.</em></h1>
+    <p class="sub banner-sub">The future is getting built.</p>
+
+    <form class="form" id="form" autocomplete="off" onsubmit="return false;">
+      <div class="field">
+        <label for="f-name">Name / company</label>
+        <input type="text" id="f-name" placeholder="Your name, or the team" />
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input type="email" id="f-email" placeholder="you@company.com" />
+      </div>
+      <div class="field">
+        <label for="f-phone">Contact number</label>
+        <div class="phone-row">
+          <select id="f-cc" aria-label="Country code">
+            <option value="+91" selected>+91 IN</option>
+            <option value="+1">+1 US</option>
+            <option value="+44">+44 UK</option>
+            <option value="+971">+971 AE</option>
+            <option value="+65">+65 SG</option>
+            <option value="+61">+61 AU</option>
+            <option value="+49">+49 DE</option>
+            <option value="+33">+33 FR</option>
+            <option value="+81">+81 JP</option>
+            <option value="+86">+86 CN</option>
+            <option value="+31">+31 NL</option>
+            <option value="+46">+46 SE</option>
+            <option value="+41">+41 CH</option>
+            <option value="+34">+34 ES</option>
+            <option value="+39">+39 IT</option>
+            <option value="+7">+7 RU</option>
+            <option value="+27">+27 ZA</option>
+            <option value="+64">+64 NZ</option>
+            <option value="+82">+82 KR</option>
+            <option value="+55">+55 BR</option>
+          </select>
+          <input type="tel" id="f-phone" placeholder="00000 00000" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="submit" id="submit" disabled>Submit</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- SCREEN 3 — Thank you -->
+  <section class="screen thanks" id="s-thanks">
+    <h1><em>Thank you.</em></h1>
+    <p class="sub">Consider it already on the bench — we’ll be in touch within <em style="color:var(--accent);font-style:normal;">48 hours</em>.</p>
+  </section>
+
+</div>
+
+<script>
+  /* ── Screens ───────────────────── */
+  const screens = {
+    ask: document.getElementById('s-ask'),
+    form: document.getElementById('s-form'),
+    thanks: document.getElementById('s-thanks'),
+  };
+  function show(name) {
+    for (const k in screens) screens[k].classList.remove('active');
+    // restart fade-in animation
+    screens[name].style.animation = 'none';
+    void screens[name].offsetWidth;
+    screens[name].style.animation = '';
+    screens[name].classList.add('active');
+  }
+
+  /* ── Idea input + Enter ─────────── */
+  const idea = document.getElementById('idea');
+  const enterHint = document.getElementById('enter-hint');
+
+  function autogrow() {
+    idea.style.height = 'auto';
+    idea.style.height = Math.max(90, idea.scrollHeight) + 'px';
+    enterHint.classList.toggle('show', idea.value.trim().length > 2);
+  }
+  idea.addEventListener('input', autogrow);
+  idea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && idea.value.trim().length > 2) {
+      e.preventDefault();
+      stopMic();
+      show('form');
+      setTimeout(() => document.getElementById('f-name').focus(), 500);
+    }
+  });
+
+  /* ── Web Speech API mic ─────────── */
+  const mic = document.getElementById('mic');
+  const micHint = document.getElementById('mic-hint');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, listening = false, baseText = '';
+
+  function startMic() {
+    if (!SR) {
+      micHint.textContent = 'Not supported in this browser';
+      micHint.classList.add('err');
+      return;
+    }
+    rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = 'en-IN';
+    baseText = idea.value ? idea.value.trim() + ' ' : '';
+    rec.onresult = (e) => {
+      let finalTxt = '', interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalTxt += t + ' ';
+        else interim += t;
+      }
+      if (finalTxt) baseText += finalTxt;
+      idea.value = (baseText + interim).replace(/\s+/g, ' ').trimStart();
+      autogrow();
+    };
+    rec.onerror = (e) => {
+      micHint.textContent = e.error === 'not-allowed' ? 'Microphone blocked' : 'Try again';
+      micHint.classList.add('err');
+      stopMic();
+    };
+    rec.onend = () => { if (listening) { try { rec.start(); } catch(_){} } };
+    try { rec.start(); } catch(_){}
+    listening = true;
+    mic.classList.add('listening');
+    micHint.textContent = 'Listening · press Enter when done';
+    micHint.classList.remove('err');
+    idea.focus();
+  }
+  function stopMic() {
+    listening = false;
+    if (rec) { try { rec.stop(); } catch(_){} rec = null; }
+    mic.classList.remove('listening');
+    micHint.textContent = 'Tap to dictate';
+    micHint.classList.remove('err');
+  }
+  mic.addEventListener('click', () => {
+    if (listening) stopMic(); else startMic();
+  });
+
+  /* ── Form fields ─────────────────── */
+  const fName = document.getElementById('f-name');
+  const fEmail = document.getElementById('f-email');
+  const fPhone = document.getElementById('f-phone');
+  const submit = document.getElementById('submit');
+
+  function checkForm() {
+    const emailOk = /.+@.+\..+/.test(fEmail.value.trim());
+    submit.disabled = !(fName.value.trim() && emailOk && fPhone.value.trim().length >= 6);
+  }
+  fName.addEventListener('input', checkForm);
+  fEmail.addEventListener('input', checkForm);
+  fPhone.addEventListener('input', checkForm);
+
+  /* ── Submit ──────────────────────── */
+  function finish() { show('thanks'); }
+  document.getElementById('form').addEventListener('submit', finish);
+  submit.addEventListener('click', (e) => { e.preventDefault(); if (!submit.disabled) finish(); });
+</script>
+
+</body>
+</html>
