@@ -1,10 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { Chrome, NavLink } from "@/components/Chrome";
 import styles from "./page.module.css";
-
-export const metadata = {
-  title: "Lab — 3033",
-};
 
 type Status = "bench" | "shipped" | "cad" | "rd" | "concept" | "beta" | "archive";
 const projects: { id: string; n: string; year: string; status: Status; label: string }[] = [
@@ -27,22 +26,34 @@ const projects: { id: string; n: string; year: string; status: Status; label: st
 ];
 
 export default function Outputs() {
+  const gridRef = useRef<HTMLDivElement | null>(null);
   const liveCount = projects.filter((p) => p.status === "bench").length;
   const shippedCount = projects.filter((p) => p.status === "shipped").length;
 
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (e.deltaY === 0) return;
+      grid.scrollLeft += e.deltaY;
+      e.preventDefault();
+    };
+    grid.addEventListener("wheel", onWheel, { passive: false });
+    return () => grid.removeEventListener("wheel", onWheel);
+  }, []);
+
   return (
     <>
-      <main className={styles.page}>
+      <main className={styles.stage}>
         <header className={styles.hero}>
-          <p className="eyebrow">Enter Lab — sixteen outputs</p>
+          <p className="eyebrow">Enter Lab — scroll right</p>
           <h1 className={`display ${styles.headline}`}>
-            The <em className="em-accent">bench</em>, the field,
-            <br />
-            the archive.
+            The <em className="em-accent">bench</em>, the field, the archive.
           </h1>
         </header>
 
-        <section className={styles.grid}>
+        <section className={styles.grid} ref={gridRef}>
           {projects.map((p) => (
             <Link
               key={p.id}
@@ -53,7 +64,9 @@ export default function Outputs() {
               <div className={styles.art} />
               <span className={styles.tileTl}>Project {p.n}</span>
               <span className={styles.tileBl}>
-                <span className={`${styles.statusDot} ${p.status === "bench" ? styles.live : ""}`} />
+                <span
+                  className={`${styles.statusDot} ${p.status === "bench" ? styles.live : ""}`}
+                />
                 {p.label}
               </span>
               <span className={styles.tileBr}>{p.year}</span>

@@ -1,33 +1,53 @@
-.page {
-  min-height: 100vh;
-  padding: calc(var(--pad) * 2.8) var(--pad) calc(var(--pad) * 3);
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--pad) * 2.6) var(--pad) calc(var(--pad) * 2.4);
+  overflow: hidden;
 }
 
 .hero {
+  flex: 0 0 auto;
+  margin-bottom: clamp(16px, 2vh, 28px);
   max-width: 1400px;
-  margin: 0 auto clamp(32px, 5vh, 60px);
 }
 
 .headline {
-  margin-top: 14px;
-  font-size: clamp(52px, 9vw, 180px);
-  line-height: 0.92;
-  letter-spacing: -0.04em;
+  margin-top: 10px;
+  font-size: clamp(44px, 6vw, 110px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
   color: var(--ink);
   text-wrap: balance;
+  max-width: 1200px;
 }
 
+/* ── Horizontal, two-row grid — never overflows viewport vertically ── */
 .grid {
-  max-width: 1400px;
-  margin: 0 auto;
+  flex: 1 1 auto;
+  /* Tile side = (available grid height - 6px gap) / 2 — so rows and columns
+     share the same pixel value and tiles stay perfectly square with no
+     horizontal dead space between columns. */
+  --tile: calc((100vh - var(--pad) * 5 - clamp(40px, 7vw, 110px) - 6px) / 2);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: var(--tile) var(--tile);
+  grid-auto-flow: column;
+  grid-auto-columns: var(--tile);
   gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  align-content: start;
 }
+.grid::-webkit-scrollbar { display: none; }
 
 .tile {
   position: relative;
-  aspect-ratio: 1 / 1;
+  width: var(--tile);
+  height: var(--tile);
   overflow: hidden;
   background: var(--bg-2);
   color: var(--ink);
@@ -47,8 +67,8 @@
     );
   transition: transform 0.7s var(--ease);
 }
-
 .tile:hover .art { transform: scale(1.04); }
+
 .tile::after {
   content: "";
   position: absolute;
@@ -76,40 +96,46 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink);
-  opacity: 0;
   transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
   pointer-events: none;
   white-space: nowrap;
 }
-.tile:hover .tileTl,
-.tile:hover .tileBl,
-.tile:hover .tileBr { opacity: 1; color: #fff; }
 
 .tileTl {
-  top: 18px;
-  left: 20px;
+  top: 16px;
+  left: 18px;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: -0.01em;
   text-transform: none;
+  color: var(--ink);
+  opacity: 0.7;
 }
+.tile:hover .tileTl { opacity: 1; color: #fff; }
+
 .tileBl {
-  bottom: 18px;
-  left: 20px;
+  bottom: 16px;
+  left: 18px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  opacity: 0;
   transform: translateY(4px);
 }
 .tileBr {
-  bottom: 18px;
-  right: 20px;
+  bottom: 16px;
+  right: 18px;
   font-variant-numeric: tabular-nums;
+  opacity: 0;
   transform: translateY(4px);
 }
 .tile:hover .tileBl,
-.tile:hover .tileBr { transform: translateY(0); }
+.tile:hover .tileBr {
+  opacity: 1;
+  transform: translateY(0);
+  color: #fff;
+}
 
 .statusDot {
   width: 7px;
@@ -150,5 +176,18 @@
   50%      { opacity: 0.45; }
 }
 
-@media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 720px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px) {
+  .stage {
+    position: static;
+    overflow: visible;
+    min-height: 100vh;
+  }
+  .grid {
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    grid-auto-columns: initial;
+    grid-template-columns: repeat(2, 1fr);
+    overflow: visible;
+  }
+  .tile { height: auto; }
+}
