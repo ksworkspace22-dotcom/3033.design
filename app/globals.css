@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ─────────────────────────────────────────────────────────────
    3033 — design tokens
    Palette: warm cream + deep ink, vermilion accent
@@ -9,6 +5,10 @@
    ───────────────────────────────────────────────────────────── */
 
 @import url("https://api.fontshare.com/v2/css?f[]=gambarino@400,700&f[]=satoshi@300,400,500,700&f[]=satoshi-italic@300i,400i&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root,
 html[data-theme="light"] {
