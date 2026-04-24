@@ -49,7 +49,8 @@ export default function Outputs() {
         <header className={styles.hero}>
           <p className="eyebrow">Enter Lab — scroll right</p>
           <h1 className={`display ${styles.headline}`}>
-            The <em className="em-accent">bench</em>, the field, the archive.
+            Sixteen <em className="em-accent">mechanisms</em> on the road
+            between the bench and the field.
           </h1>
         </header>
 

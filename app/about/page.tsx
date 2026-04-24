@@ -118,13 +118,13 @@ export default function About() {
           <section className={`${styles.panel} ${styles.pIntro}`}>
             <p className="eyebrow">01 · About</p>
             <h1 className={`display ${styles.headline}`}>
-              Small on <em className="em-accent">purpose</em>.<br />
-              Close to the <em className="em-accent">bench</em>.
+              Three people, <em className="em-accent">one bench</em> per idea.
             </h1>
             <p className={styles.lede}>
-              3033 is a hardware and robotics studio in Bengaluru and Ahmedabad.
-              We take ideas from sketch to field in months, not quarters — and
-              we stay on the bench with you after they ship.
+              Every mechanism we build moves from the first sketch through the
+              field inside a single head, and then it stays there while the
+              field teaches it what the bench could not. We think that is why
+              the ones we ship tend to still be running a year later.
             </p>
           </section>
 
@@ -144,11 +144,13 @@ export default function About() {
           <section className={`${styles.panel} ${styles.pLoc}`}>
             <p className="eyebrow">03 · Two spaces</p>
             <h2 className={`display ${styles.sectionHead}`}>
-              <em className="em-accent">Bengaluru.</em> Ahmedabad.
+              A bench in <em className="em-accent">Bengaluru</em>, another in
+              Ahmedabad.
             </h2>
             <p className={styles.lede}>
-              One bench south, one bench west. Drive, fly, or call — whichever
-              gets you on the bench fastest.
+              Most of the machining happens in Ahmedabad, most of the
+              electronics in Bengaluru, and both of us are in the field the
+              week something ships. The rest is a flight or a phone call away.
             </p>
           </section>
 
@@ -168,8 +170,8 @@ export default function About() {
           <section className={`${styles.panel} ${styles.pCta}`}>
             <p className="eyebrow">05 · Collaborate</p>
             <h2 className={`display ${styles.sectionHead}`}>
-              If this sounds like your <em className="em-accent">kind</em> of
-              studio —
+              If you have a mechanism that needs{" "}
+              <em className="em-accent">building</em>, tell us about it.
             </h2>
             <Link href="/connect" className={styles.ctaBtn}>
               <span>Start a project</span>

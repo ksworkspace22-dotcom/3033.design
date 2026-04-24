@@ -46,9 +46,8 @@ export default function Notes() {
         <header className={styles.hero}>
           <p className="eyebrow">Notes — from the bench</p>
           <h1 className={`display ${styles.headline}`}>
-            Field log, <em className="em-accent">essays</em>,
-            <br />
-            and principles.
+            Notes from the <em className="em-accent">bench</em> and the field,
+            plus a few principles we keep learning the hard way.
           </h1>
         </header>
 

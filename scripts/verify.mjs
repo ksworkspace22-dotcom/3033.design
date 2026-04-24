@@ -18,21 +18,19 @@ const checks = [
   {
     path: "/",
     name: "home",
-    mustSee: ["3033", "Enter Lab", "collaborate", "Hardware × Robotics"],
+    mustSee: ["3033", "Enter Lab", "collaborate", "Hardware", "Robotics", "Studio"],
     heroSelector: '[class*="hero"]',
   },
   {
     path: "/about",
     name: "about",
-    mustSee: ["Small on", "purpose", "bench", "Kathan"],
+    mustSee: ["Three people", "one bench", "Kathan", "Nidhish"],
     heroSelector: '[class*="headline"]',
   },
   {
     path: "/outputs",
     name: "outputs",
-    // "Project 01" is rendered by every tile even when not hovered,
-    // so it should be present in the DOM string.
-    mustSee: ["Enter Lab", "bench", "Project 01", "Project 16"],
+    mustSee: ["Enter Lab", "Sixteen", "mechanisms", "Project 01", "Project 16"],
     heroSelector: '[class*="headline"]',
   },
   {
@@ -44,7 +42,7 @@ const checks = [
   {
     path: "/notes",
     name: "notes",
-    mustSee: ["Field log", "essays", "principles"],
+    mustSee: ["Notes from the", "bench", "principles"],
     heroSelector: '[class*="headline"]',
   },
 ];

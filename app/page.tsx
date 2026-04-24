@@ -10,16 +10,20 @@ export default function Home() {
         <div className={styles.halo} aria-hidden />
 
         <div className={styles.statement}>
-          <p className={`eyebrow ${styles.kicker}`}>Hardware × Robotics Studio</p>
-
           <h1 className={`display ${styles.hero}`}>
             3<span className={styles.zero}>0</span>33
           </h1>
 
+          <p className={`display ${styles.tagline}`}>
+            Hardware <span className={styles.cross}>×</span> Robotics{" "}
+            <em className="em-accent">Studio</em>
+          </p>
+
           <p className={styles.sub}>
-            We build <em className="em-accent">ideas</em> that leave the screen. A small
-            hardware &amp; robotics studio in Bengaluru and Ahmedabad — sketch to field,
-            in months not quarters.
+            We take mechanisms from the first sketch through field testing, and
+            stay on the bench for every revision after that. Two shops —
+            Bengaluru and Ahmedabad — working with small teams that actually
+            ship.
           </p>
 
           <div className={styles.ctas}>
@@ -44,13 +48,6 @@ export default function Home() {
       </main>
 
       <Chrome
-        tl={{
-          node: (
-            <Link href="/" className={styles.wordmark}>
-              3033
-            </Link>
-          ),
-        }}
         tr={{ node: <NavLink href="/about">About</NavLink> }}
         bl={{
           node: (
@@ -60,9 +57,7 @@ export default function Home() {
             </span>
           ),
         }}
-        br={{
-          node: <NavLink href="/notes">Notes</NavLink>,
-        }}
+        br={{ node: <NavLink href="/notes">Notes</NavLink> }}
       />
     </>
   );
