@@ -1,0 +1,58 @@
+.chrome {
+  position: fixed;
+  inset: 0;
+  padding: var(--pad);
+  pointer-events: none;
+  z-index: 30;
+  display: grid;
+  grid-template-areas:
+    "tl tr"
+    "bl br";
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr 1fr;
+}
+.chrome > * { pointer-events: auto; }
+
+.tl { grid-area: tl; justify-self: start; align-self: start; }
+.tr { grid-area: tr; justify-self: end;   align-self: start; }
+.bl { grid-area: bl; justify-self: start; align-self: end;   }
+.br { grid-area: br; justify-self: end;   align-self: end;   }
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(13px, 0.95vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.underline {
+  padding-bottom: 4px;
+  position: relative;
+}
+.underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
+}
+.underline:hover::after { transform: scaleX(1); }
+.underline:hover { color: var(--accent); }
+
+.accent {
+  color: var(--accent);
+}
+.accent:hover { opacity: 0.7; }
