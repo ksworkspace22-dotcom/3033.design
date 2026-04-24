@@ -54,8 +54,7 @@ html[data-theme="dark"] {
 
 html, body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;       /* no-scroll concept preserved */
+  min-height: 100%;
   overscroll-behavior: none;
   background: var(--bg);
   color: var(--ink);
