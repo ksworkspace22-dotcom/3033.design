@@ -2,12 +2,15 @@ import Link from "next/link";
 import { Chrome, NavLink } from "@/components/Chrome";
 import styles from "./page.module.css";
 
-export function generateMetadata({ params }: { params: { id: string } }) {
-  return { title: `${params.id} — 3033` };
+type Params = Promise<{ id: string }>;
+
+export async function generateMetadata({ params }: { params: Params }) {
+  const { id } = await params;
+  return { title: `${id} — 3033` };
 }
 
-export default function Project({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function Project({ params }: { params: Params }) {
+  const { id } = await params;
   return (
     <>
       <main className={styles.page}>
